@@ -1,0 +1,158 @@
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    checkNotification();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkEvent();
+});
+
+
+
+
+function checkNotification() {
+
+    fetch('/api/check-notification/0')
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.is_active) {
+            const redMark = document.getElementById('red-mark-placeholder');
+            redMark.innerHTML = '<span class="red-mark"></span>';
+        }
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function checkEvent() {
+
+    fetch('/api/check-event/0')
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.is_active) {
+            const redMark = document.getElementById('red-mark-placeholdere');
+            redMark.innerHTML = '<span class="red-mark"></span>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const openButton = document.getElementById('open-button');
+
+      const popupContainer = document.getElementById('popup-container');
+
+      const overlay = document.getElementById('overlay');
+
+      const closeButton = document.getElementById('close-btn');
+
+
+
+      openButton.addEventListener('click', function () {
+
+        popupContainer.style.display = 'block';
+
+        overlay.style.display = 'block';
+
+      });
+
+
+
+
+      overlay.addEventListener('click', function () {
+
+        popupContainer.style.display = 'none';
+
+        overlay.style.display = 'none';
+
+      });
+
+    });
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+             let resetLink = document.getElementById("logoutBtn");
+            let timerElement = document.getElementById("timer");
+            let seconds = localStorage.getItem("timerSeconds") ? parseInt(localStorage.getItem("timerSeconds")) : 0;
+            let timerInterval;
+            let isPaused = document.cookie.includes("timerPaused=true");
+
+           function startTimer() {
+        if (!isPaused) {
+            timerInterval = setInterval(function () {
+                seconds++;
+                const formattedTime = formatTime(seconds);
+                timerElement.textContent = formattedTime;
+                localStorage.setItem("timerSeconds", seconds);
+            }, 1000);
+        }
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        isPaused = true; // Update the isPaused flag
+        document.cookie = "timerPaused=true"; // Set session cookie to indicate timer is paused
+    }
+
+    function resumeTimer() {
+        isPaused = false; // Update the isPaused flag
+        document.cookie = "timerPaused=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Clear session cookie
+        startTimer();
+    }
+
+
+              resetLink.addEventListener("click", function () {
+                clearInterval(timerInterval);
+                seconds = 0;
+                localStorage.setItem("timerSeconds", seconds);
+                timerElement.textContent = formatTime(seconds);
+                startTimer();
+            });
+
+
+            function formatTime(seconds) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const remainingSeconds = seconds % 60;
+
+                const formattedHours = padZero(hours);
+                const formattedMinutes = padZero(minutes);
+                const formattedSeconds = padZero(remainingSeconds);
+
+                return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            }
+
+            function padZero(number) {
+                return number < 10 ? `0${number}` : `${number}`;
+            }
+
+
+               startTimer();
+
+               if (isPaused) {
+                document.getElementById('timer').innerText = "ON BREAK";
+
+    }
+
+
+            // Listen for messages from other browsing contexts
+            const channel = new BroadcastChannel('timer_channel');
+            channel.onmessage = function(event) {
+                if (event.data === 'pause') {
+                    pauseTimer();
+                } else if (event.data === 'resume') {
+                    resumeTimer();
+                }
+            };
+        });
