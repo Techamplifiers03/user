@@ -1,0 +1,22 @@
+@login_required
+# Employees
+def employees(request):
+    raw = '''select * from public.employee_information_employee_personal as e
+LEFT join public.employee_information_manageremployee as m
+on e.id = m.employee_id;'''
+    employee_list = Employee_personal.objects.raw(raw)
+    for i in employee_list:
+        if i.manager_id != None:
+            d = User.objects.get(id=i.manager_id)
+            i.manager_id = d.username
+        i.save()
+
+    managers = User.objects.filter(user_type='Manager')
+    data = User.objects.filter(is_active=False)
+    context = {
+        'page_title': 'Employees',
+        'employees': employee_list,
+        'managers': managers,
+        'employee': data
+    }
+    return render(request, 'employee_information/employees.html', context)
